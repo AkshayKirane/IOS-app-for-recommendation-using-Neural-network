@@ -7,16 +7,28 @@
 //
 
 import UIKit
+import AWSMobileClient
+import AWSCore
+import AWSS3
+import AWSCognito
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
+    let identityID = "us-east-2:6d97718f-6115-43af-ad6c-7f7802560681"
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        let credentialsProvider = AWSCognitoCredentialsProvider(regionType:.USEast2,identityPoolId:identityID)
+        
+        let configuration = AWSServiceConfiguration(region:.USEast2, credentialsProvider:credentialsProvider)
+        
+        AWSServiceManager.default().defaultServiceConfiguration = configuration
+        
         return true
+        //return AWSMobileClient.sharedInstance().interceptApplication(application,didFinishLaunchingWithOptions: launchOptions)
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
@@ -40,6 +52,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
+    func application(_ application: UIApplication, handleEventsForBackgroundURLSession identifier: String, completionHandler: @escaping () -> Void) {
+        /*
+         Store the completion handler.
+         */
+        AWSS3TransferUtility.interceptApplication(application, handleEventsForBackgroundURLSession: identifier, completionHandler: completionHandler)
+    }
+    
 
 
 }
